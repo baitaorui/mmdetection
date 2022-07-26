@@ -15,7 +15,7 @@ model = dict(
         init_cfg=dict(type='Pretrained', checkpoint='torchvision://resnet50')),
     bbox_head=dict(
         type='DETRHead',
-        num_classes=80,
+        num_classes=4,
         in_channels=2048,
         transformer=dict(
             type='Transformer',
@@ -81,9 +81,10 @@ train_pipeline = [
         policies=[[
             dict(
                 type='Resize',
-                img_scale=[(480, 1333), (512, 1333), (544, 1333), (576, 1333),
-                           (608, 1333), (640, 1333), (672, 1333), (704, 1333),
-                           (736, 1333), (768, 1333), (800, 1333)],
+                # img_scale=[(480, 1333), (512, 1333), (544, 1333), (576, 1333),
+                #            (608, 1333), (640, 1333), (672, 1333), (704, 1333),
+                #            (736, 1333), (768, 1333), (800, 1333)],
+                img_scale=[(608,608)],
                 multiscale_mode='value',
                 keep_ratio=True)
         ],
@@ -120,7 +121,7 @@ test_pipeline = [
     dict(type='LoadImageFromFile'),
     dict(
         type='MultiScaleFlipAug',
-        img_scale=(1333, 800),
+        img_scale=(608, 608),
         flip=False,
         transforms=[
             dict(type='Resize', keep_ratio=True),
@@ -148,3 +149,4 @@ optimizer_config = dict(grad_clip=dict(max_norm=0.1, norm_type=2))
 # learning policy
 lr_config = dict(policy='step', step=[100])
 runner = dict(type='EpochBasedRunner', max_epochs=150)
+work_dir='work_dirs/detr/'

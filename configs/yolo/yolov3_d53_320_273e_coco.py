@@ -40,3 +40,8 @@ data = dict(
     train=dict(pipeline=train_pipeline),
     val=dict(pipeline=test_pipeline),
     test=dict(pipeline=test_pipeline))
+runner = dict(type='EpochBasedRunner', max_epochs=150)
+evaluation = dict(interval=5, metric=['bbox'])
+work_dir = './work_dirs/yolov33'
+gpu_ids = range(0, 4)
+auto_resume = True

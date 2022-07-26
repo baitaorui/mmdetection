@@ -25,7 +25,7 @@ model = dict(
         block_dilations=[2, 4, 6, 8]),
     bbox_head=dict(
         type='YOLOFHead',
-        num_classes=80,
+        num_classes=4,
         in_channels=512,
         reg_decoded_bbox=True,
         anchor_generator=dict(
@@ -75,7 +75,7 @@ img_norm_cfg = dict(
 train_pipeline = [
     dict(type='LoadImageFromFile'),
     dict(type='LoadAnnotations', with_bbox=True),
-    dict(type='Resize', img_scale=(1333, 800), keep_ratio=True),
+    dict(type='Resize', img_scale=(640, 640), keep_ratio=True),
     dict(type='RandomFlip', flip_ratio=0.5),
     dict(type='RandomShift', shift_ratio=0.5, max_shift_px=32),
     dict(type='Normalize', **img_norm_cfg),
@@ -87,7 +87,7 @@ test_pipeline = [
     dict(type='LoadImageFromFile'),
     dict(
         type='MultiScaleFlipAug',
-        img_scale=(1333, 800),
+        img_scale=(640, 640),
         flip=False,
         transforms=[
             dict(type='Resize', keep_ratio=True),

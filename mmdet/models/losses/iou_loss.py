@@ -461,6 +461,9 @@ class CIoULoss(nn.Module):
             # TODO: remove this in the future
             # reduce the weight of shape (n, 4) to (n,) to match the
             # giou_loss of shape (n,)
+            print("uuuuuuuuuuuuuuuu")
+            print(weight.shape)
+            print(pred.shape)
             assert weight.shape == pred.shape
             weight = weight.mean(-1)
         loss = self.loss_weight * ciou_loss(

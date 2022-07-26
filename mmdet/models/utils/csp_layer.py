@@ -148,3 +148,6 @@ class CSPLayer(BaseModule):
 
         x_final = torch.cat((x_main, x_short), dim=1)
         return self.final_conv(x_final)
+    
+    # def rfp_forward(self, x, rfp_feat):
+
