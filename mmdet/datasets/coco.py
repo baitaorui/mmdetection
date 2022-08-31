@@ -37,7 +37,33 @@ class CocoDataset(CustomDataset):
     #            'oven', 'toaster', 'sink', 'refrigerator', 'book', 'clock',
     #            'vase', 'scissors', 'teddy bear', 'hair drier', 'toothbrush')
 
-    CLASSES = ('badge','offground','ground','belt')
+    # CLASSES = ('badge','offground','ground','belt')
+    CLASSES = ('baishi_500',
+'baishi_330',
+'baishi_black_330',
+'baisuishan',
+'dongfangshuye',
+'dongpeng',
+'hongniu',
+'ksf_binghongcha',
+'ksf_lvcha',
+'ksf_molimi',
+'ksf_moliqing',
+'ksf_qinmeilvcha',
+'kekoukele_330',
+'kekoukele_600',
+'maidong',
+'nongfushanquan',
+'shuirongc100',
+'shanzhashuxia',
+'asamu_nailv',
+'asamu_naicha',
+'guolicheng',
+'xuebi_330',
+'yezizhi',
+'yuanqi',
+'yuanqi_waixingren'
+)
 
     PALETTE = [(220, 20, 60), (119, 11, 32), (0, 0, 142), (0, 0, 230),
                (106, 0, 228), (0, 60, 100), (0, 80, 100), (0, 0, 70),

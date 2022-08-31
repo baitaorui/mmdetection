@@ -227,6 +227,7 @@ def ciou_loss(pred, target, eps=1e-7):
 
     factor = 4 / math.pi**2
     v = factor * torch.pow(torch.atan(w2 / h2) - torch.atan(w1 / h1), 2)
+    # v = factor * torch.pow(torch.atan(w2 / h2) + torch.atan(w1 / h1) - (math.pi / 2), 2)
 
     with torch.no_grad():
         alpha = (ious > 0.5).float() * v / (1 - ious + v)
@@ -461,9 +462,6 @@ class CIoULoss(nn.Module):
             # TODO: remove this in the future
             # reduce the weight of shape (n, 4) to (n,) to match the
             # giou_loss of shape (n,)
-            print("uuuuuuuuuuuuuuuu")
-            print(weight.shape)
-            print(pred.shape)
             assert weight.shape == pred.shape
             weight = weight.mean(-1)
         loss = self.loss_weight * ciou_loss(
