@@ -3,7 +3,6 @@ import math
 
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
 from mmcv.cnn import ConvModule, DepthwiseSeparableConvModule
 from mmcv.runner import BaseModule
 
@@ -11,18 +10,8 @@ from ..builder import NECKS
 from ..utils import CSPLayer
 
 
-class Ups2(nn.Module):
-    def __init__(self, inchannel):
-        super(Ups2, self).__init__()
-        self.conv = nn.Conv2d(inchannel, inchannel * 2, (1, 1), (1, 1))
-        self.pixel_shuffle = nn.PixelShuffle(2)
-
-    def forward(self, x):
-        x = self.pixel_shuffle(self.conv(x))
-        return x
-
 @NECKS.register_module()
-class SubYOLOXPAFPN(BaseModule):
+class LinearYOLOXPAFPN(BaseModule):
     """Path Aggregation Network used in YOLOX.
 
     Args:
@@ -59,18 +48,14 @@ class SubYOLOXPAFPN(BaseModule):
                      distribution='uniform',
                      mode='fan_in',
                      nonlinearity='leaky_relu')):
-        super(SubYOLOXPAFPN, self).__init__(init_cfg)
+        super(LinearYOLOXPAFPN, self).__init__(init_cfg)
         self.in_channels = in_channels
         self.out_channels = out_channels
 
         conv = DepthwiseSeparableConvModule if use_depthwise else ConvModule
 
         # build top-down blocks
-        # self.upsample = nn.Upsample(**upsample_cfg)
-        # self.upsamples = [Ups2(inc) for inc in self.in_channels]
-        self.upsamples = nn.ModuleList()
-        for inc in self.in_channels:
-            self.upsamples.append(Ups2(inc))
+        self.upsample = nn.Upsample(scale_factor=2, mode='bilinear')
         self.reduce_layers = nn.ModuleList()
         self.top_down_blocks = nn.ModuleList()
         for idx in range(len(in_channels) - 1, 0, -1):
@@ -142,16 +127,13 @@ class SubYOLOXPAFPN(BaseModule):
         # top-down path
         inner_outs = [inputs[-1]]
         for idx in range(len(self.in_channels) - 1, 0, -1):
-            feat = inner_outs[0]
             feat_heigh = inner_outs[0]
             feat_low = inputs[idx - 1]
             feat_heigh = self.reduce_layers[len(self.in_channels) - 1 - idx](
                 feat_heigh)
             inner_outs[0] = feat_heigh
 
-            upsample_feat = self.upsamples[idx].to(feat.device)(feat)
-            # print(upsample_feat.shape)
-            # print(feat_low.shape)
+            upsample_feat = self.upsample(feat_heigh)
 
             inner_out = self.top_down_blocks[len(self.in_channels) - 1 - idx](
                 torch.cat([upsample_feat, feat_low], 1))

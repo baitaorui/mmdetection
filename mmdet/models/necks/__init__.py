@@ -18,9 +18,14 @@ from .yolox_pafpn import YOLOXPAFPN
 from .rpa import RPA
 from .sub_pixel_yolox_pafpn import SubYOLOXPAFPN
 from .transformer_pafpn import TFYOLOXPAFPN
+from .c_trans_pafpn import CTFYOLOXPAFPN
+from .sac_trans_pafpn import SACYOLOXPAFPN
+from .sac_conv_pafpn import SAConvPAFPN
+from .up_linear import LinearYOLOXPAFPN
+from .dconv import DconvYOLOXPAFPN
 
 __all__ = [
     'FPN', 'BFP', 'ChannelMapper', 'HRFPN', 'NASFPN', 'FPN_CARAFE', 'PAFPN',
     'NASFCOS_FPN', 'RFP', 'YOLOV3Neck', 'FPG', 'DilatedEncoder',
-    'CTResNetNeck', 'SSDNeck', 'YOLOXPAFPN', 'DyHead', 'RPA','SubYOLOXPAFPN','TFYOLOXPAFPN'
+    'CTResNetNeck', 'SSDNeck', 'YOLOXPAFPN', 'DyHead', 'RPA','SubYOLOXPAFPN','TFYOLOXPAFPN','CTFYOLOXPAFPN','SACYOLOXPAFPN', 'SAConvPAFPN', 'LinearYOLOXPAFPN', 'DconvYOLOXPAFPN'
 ]

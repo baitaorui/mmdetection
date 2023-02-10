@@ -17,11 +17,16 @@ from .ssd_vgg import SSDVGG
 from .swin import SwinTransformer
 from .trident_resnet import TridentResNet
 from .rfp_csp_darknet import RFP_CSPDarknet
+from .ctf_darknet import CTFDarknet
+from .ctf_sac_darknet import CTFSACDarknet
+from .sac_conv_darknet import SAConvDarknet
+from .ctf2_darlnet import CTF2Darknet
+from .sac2_darknet import CTFSAC2Darknet
 
 __all__ = [
     'RegNet', 'ResNet', 'ResNetV1d', 'ResNeXt', 'SSDVGG', 'HRNet',
     'MobileNetV2', 'Res2Net', 'HourglassNet', 'DetectoRS_ResNet',
     'DetectoRS_ResNeXt', 'Darknet', 'ResNeSt', 'TridentResNet', 'CSPDarknet',
     'SwinTransformer', 'PyramidVisionTransformer',
-    'PyramidVisionTransformerV2', 'EfficientNet','RFP_CSPDarknet'
+    'PyramidVisionTransformerV2', 'EfficientNet','RFP_CSPDarknet', 'CTFDarknet','CTFSACDarknet', 'SAConvDarknet', 'CTF2Darknet','CTFSAC2Darknet'
 ]

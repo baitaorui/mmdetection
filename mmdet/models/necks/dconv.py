@@ -14,15 +14,18 @@ from ..utils import CSPLayer
 class Ups2(nn.Module):
     def __init__(self, inchannel):
         super(Ups2, self).__init__()
-        self.conv = nn.Conv2d(inchannel, inchannel * 2, (1, 1), (1, 1))
-        self.pixel_shuffle = nn.PixelShuffle(2)
+        self.up = nn.ConvTranspose2d(
+            inchannel,
+            inchannel // 2,
+            kernel_size=2,
+            stride=2)
 
     def forward(self, x):
-        x = self.pixel_shuffle(self.conv(x))
+        x = self.up(x)
         return x
 
 @NECKS.register_module()
-class SubYOLOXPAFPN(BaseModule):
+class DconvYOLOXPAFPN(BaseModule):
     """Path Aggregation Network used in YOLOX.
 
     Args:
@@ -59,7 +62,7 @@ class SubYOLOXPAFPN(BaseModule):
                      distribution='uniform',
                      mode='fan_in',
                      nonlinearity='leaky_relu')):
-        super(SubYOLOXPAFPN, self).__init__(init_cfg)
+        super(DconvYOLOXPAFPN, self).__init__(init_cfg)
         self.in_channels = in_channels
         self.out_channels = out_channels
 
@@ -150,8 +153,6 @@ class SubYOLOXPAFPN(BaseModule):
             inner_outs[0] = feat_heigh
 
             upsample_feat = self.upsamples[idx].to(feat.device)(feat)
-            # print(upsample_feat.shape)
-            # print(feat_low.shape)
 
             inner_out = self.top_down_blocks[len(self.in_channels) - 1 - idx](
                 torch.cat([upsample_feat, feat_low], 1))

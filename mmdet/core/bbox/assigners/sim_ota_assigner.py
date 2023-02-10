@@ -237,6 +237,7 @@ class SimOTAAssigner(BaseAssigner):
         for gt_idx in range(num_gt):
             _, pos_idx = torch.topk(
                 cost[:, gt_idx], k=dynamic_ks[gt_idx], largest=False)
+                # cost[:, gt_idx], k=3, largest=False)
             matching_matrix[:, gt_idx][pos_idx] = 1
 
         del topk_ious, dynamic_ks, pos_idx

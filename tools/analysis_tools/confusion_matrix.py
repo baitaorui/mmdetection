@@ -35,7 +35,7 @@ def parse_args():
     parser.add_argument(
         '--tp-iou-thr',
         type=float,
-        default=0.5,
+        default=0.75,
         help='IoU threshold to be considered as matched')
     parser.add_argument(
         '--nms-iou-thr',
@@ -79,6 +79,9 @@ def calculate_confusion_matrix(dataset,
     confusion_matrix = np.zeros(shape=[num_classes + 1, num_classes + 1])
     assert len(dataset) == len(results)
     prog_bar = mmcv.ProgressBar(len(results))
+    ntp = 0
+    nfp = 0
+    nfn = 0
     for idx, per_img_res in enumerate(results):
         if isinstance(per_img_res, tuple):
             res_bboxes, _ = per_img_res
@@ -87,10 +90,13 @@ def calculate_confusion_matrix(dataset,
         ann = dataset.get_ann_info(idx)
         gt_bboxes = ann['bboxes']
         labels = ann['labels']
-        analyze_per_img_dets(confusion_matrix, gt_bboxes, labels, res_bboxes,
+        n1, n2, n3 = analyze_per_img_dets(confusion_matrix, gt_bboxes, labels, res_bboxes,
                              score_thr, tp_iou_thr, nms_iou_thr)
+        ntp += n1
+        nfp += n2
+        nfn += n3
         prog_bar.update()
-    return confusion_matrix
+    return confusion_matrix, ntp, nfp, nfn
 
 
 def analyze_per_img_dets(confusion_matrix,
@@ -118,6 +124,9 @@ def analyze_per_img_dets(confusion_matrix,
             change the nms IoU threshold. Default: None.
     """
     true_positives = np.zeros_like(gt_labels)
+    ntp = 0
+    nfp = 0
+    nfn = 0
     for det_label, det_bboxes in enumerate(result):
         if nms_iou_thr:
             det_bboxes, _ = nms(
@@ -135,12 +144,17 @@ def analyze_per_img_dets(confusion_matrix,
                         det_match += 1
                         if gt_label == det_label:
                             true_positives[j] += 1  # TP
+                            ntp += 1
                         confusion_matrix[gt_label, det_label] += 1
                 if det_match == 0:  # BG FP
                     confusion_matrix[-1, det_label] += 1
+                    nfp += 1
     for num_tp, gt_label in zip(true_positives, gt_labels):
         if num_tp == 0:  # FN
             confusion_matrix[gt_label, -1] += 1
+            nfn += 1
+            
+    return ntp, nfp, nfn
 
 
 def plot_confusion_matrix(confusion_matrix,
@@ -257,10 +271,13 @@ def main():
             ds_cfg.test_mode = True
     dataset = build_dataset(cfg.data.test)
 
-    confusion_matrix = calculate_confusion_matrix(dataset, results,
+    confusion_matrix, ntp, nfp, nfn = calculate_confusion_matrix(dataset, results,
                                                   args.score_thr,
                                                   args.nms_iou_thr,
                                                   args.tp_iou_thr)
+    print("")
+    print("pre:" + str(ntp / (ntp + nfp)))
+    print("recall:" + str(ntp / (ntp + nfn)))
     plot_confusion_matrix(
         confusion_matrix,
         dataset.CLASSES + ('background', ),
